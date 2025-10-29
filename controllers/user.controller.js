@@ -6,6 +6,16 @@ import VerificationEmail from "../utils/verifyEmailTemplate.js";
 import generatedAccessToken from "../utils/genrateAccessToken.js";
 import generatedRefreshToken from "../utils/genrateRefreshToken.js";
 
+import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
+
+cloudinary.config({
+  cloud_name: process.env.cloudinary_Config_Cloud_Name,
+  api_key: process.env.cloudinary_Config_api_key,
+  api_secret: process.env.cloudinary_Config_api_secret,
+  secure: true,
+});
+
 export async function registerUserController(request, response) {
   try {
     let user;
@@ -237,3 +247,53 @@ export async function logoutController(request, response) {
     });
   }
 }
+
+//image upload
+var imagesArr = [];
+export async function userAvatarController(request, response) {
+  try {
+    imagesArr = [];
+
+    const userId = request.userId;
+    const image = request.files;
+
+   
+
+    const options = {
+      user_filename: true,
+      unique_filename: false,
+      overwrite: true,
+    };
+
+    for (let i = 0; i < image?.length; i++) {
+
+      const img = await cloudinary.uploader.upload(
+        image[i]?.path,
+        options,
+        function (error, result) {
+          imagesArr.push(result.secure_url);
+          fs.unlinkSync(`uploads/${request.files[i].filename}`); //remove file from local uploads folder
+          console.log(request.files[i].filename);
+        }
+      );
+    }
+
+    return response.status(200).json({
+      _id: userId, 
+      avtar: imagesArr[0]
+
+    });
+
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+
+
+
+  
+
