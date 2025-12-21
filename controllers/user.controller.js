@@ -285,9 +285,9 @@ export async function userAvatarController(request, response) {
     }
 
     const options = {
-      user_filename: true,
+      use_filename: true,
       unique_filename: false,
-      overwrite: true,
+      overwrite: false,
     };
 
     for (let i = 0; i < image?.length; i++) {
