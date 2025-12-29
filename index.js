@@ -10,6 +10,7 @@ import helmet from "helmet";
 import connectDB from "./Config/connectDB.js";
 import userRouter from "./route/user.route.js";
 import categoryRouter from "./route/category.route.js";
+import productRouter from "./route/product.route.js";
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.get("/", (request, response) => {
 
 app.use('/api/user', userRouter)
 app.use('/api/category', categoryRouter)
+app.use('/api/product', productRouter)
 
 
 connectDB().then(() => {
